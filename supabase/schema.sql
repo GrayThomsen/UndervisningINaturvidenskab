@@ -9,6 +9,11 @@ create table public.categories (
   unique (kind, name)
 );
 
+-- array_to_string is only STABLE; generated columns need IMMUTABLE. Safe for text[].
+create function public.immutable_array_to_string(text[], text)
+returns text language sql immutable parallel safe
+as $$ select array_to_string($1, $2) $$;
+
 create table public.documents (
   id bigint generated always as identity primary key,
   title text not null,
@@ -26,7 +31,7 @@ create table public.documents (
   created_at timestamptz not null default now(),
   search tsvector generated always as (
     setweight(to_tsvector('danish', coalesce(title, '')), 'A') ||
-    setweight(to_tsvector('danish', coalesce(array_to_string(tags, ' '), '')), 'B') ||
+    setweight(to_tsvector('danish', coalesce(public.immutable_array_to_string(tags, ' '), '')), 'B') ||
     setweight(to_tsvector('danish', coalesce(description, '')), 'C')
   ) stored
 );
