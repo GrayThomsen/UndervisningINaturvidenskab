@@ -101,6 +101,7 @@ function Dashboard() {
 
       <section>
         <h2>Materialer ({docs.length})</h2>
+        <div className="table-wrap">
         <table>
           <thead>
             <tr><th>Titel</th><th>Tema</th><th>Type</th><th>Klassetrin</th><th>Status</th><th /></tr>
@@ -124,6 +125,7 @@ function Dashboard() {
             ))}
           </tbody>
         </table>
+        </div>
       </section>
 
       <CategoryManager categories={categories} onChange={reload} />
