@@ -6,6 +6,7 @@ export default function Home() {
   const [params, setParams] = useSearchParams()
   const q = params.get('q') ?? ''
   const themeId = params.get('theme') ?? ''
+  const subjectId = params.get('subject') ?? ''
   const typeId = params.get('type') ?? ''
   const grade = params.get('grade') ?? ''
 
@@ -20,7 +21,7 @@ export default function Home() {
   useEffect(() => {
     let cancelled = false
     const timer = setTimeout(() => {
-      searchDocuments({ q, themeId, typeId, grade })
+      searchDocuments({ q, themeId, subjectId, typeId, grade })
         .then((d) => !cancelled && (setDocs(d), setError('')))
         .catch((e) => !cancelled && setError(e.message))
     }, 250)
@@ -28,7 +29,7 @@ export default function Home() {
       cancelled = true
       clearTimeout(timer)
     }
-  }, [q, themeId, typeId, grade])
+  }, [q, themeId, subjectId, typeId, grade])
 
   const set = (key) => (e) => {
     const next = new URLSearchParams(params)
@@ -37,17 +38,22 @@ export default function Home() {
     setParams(next, { replace: true })
   }
   const themes = categories.filter((c) => c.kind === 'theme')
+  const subjects = categories.filter((c) => c.kind === 'subject')
   const types = categories.filter((c) => c.kind === 'type')
 
   return (
     <>
       <h1>Find undervisningsmaterialer</h1>
       <form className="filters" role="search" onSubmit={(e) => e.preventDefault()}>
-        <input type="search" placeholder="Søg i titel, beskrivelse og emneord…" aria-label="Søg"
+        <input type="search" placeholder="Søg i titel, beskrivelse, fag og emneord…" aria-label="Søg"
           value={q} onChange={set('q')} />
         <select aria-label="Tema" value={themeId} onChange={set('theme')}>
           <option value="">Alle temaer</option>
           {themes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
+        <select aria-label="Fag" value={subjectId} onChange={set('subject')}>
+          <option value="">Alle fag</option>
+          {subjects.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
         <select aria-label="Type" value={typeId} onChange={set('type')}>
           <option value="">Alle typer</option>
@@ -66,12 +72,12 @@ export default function Home() {
           <li key={d.id} className="card">
             <h2>{d.title}</h2>
             <p className="meta">
-              {[d.theme?.name, d.type?.name, d.grade && `Klassetrin: ${d.grade}`]
+              {[d.theme?.name, d.subject?.name, d.type?.name, d.grade && `Klassetrin: ${d.grade}`]
                 .filter(Boolean).join(' · ')}
             </p>
             {d.description && <p>{d.description}</p>}
             {d.tags.length > 0 && (
-              <p className="tags">{d.tags.map((t) => <span key={t}>{t}</span>)}</p>
+              <p className="tags">{d.tags.join(', ')}</p>
             )}
             <a className="btn" href={downloadUrl(d)}>
               Download {formatSize(d.file_size) && `(${formatSize(d.file_size)})`}
