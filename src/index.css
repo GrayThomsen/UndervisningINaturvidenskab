@@ -153,12 +153,16 @@ button:disabled {
   color: var(--danger);
 }
 
-/* Mobile first: 1 column, 2 from 40rem, 4 from 64rem */
+/* Mobile first: 1 column, 2 from 40rem, search on its own row and 4 filters from 64rem */
 .filters {
   display: grid;
   gap: .75rem;
   grid-template-columns: 1fr;
   margin-bottom: 1.5rem;
+}
+
+.filters select {
+  text-overflow: ellipsis;
 }
 
 @media (min-width: 40rem) {
@@ -173,11 +177,7 @@ button:disabled {
 
 @media (min-width: 64rem) {
   .filters {
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-  }
-
-  .filters input[type="search"] {
-    grid-column: auto;
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
